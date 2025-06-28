@@ -92,11 +92,13 @@
     <button onclick="sendMessage()">Send</button>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
 
+  <script>
+    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyBkr3uTfSqeeShHccsYH9B8iDKPWNTbAAY",
       authDomain: "uniinchatapp.firebaseapp.com",
@@ -107,26 +109,26 @@
       measurementId: "G-H3BJG5WCZQ"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
     let currentUser = null;
 
-    onAuthStateChanged(auth, user => {
+    auth.onAuthStateChanged(user => {
       if (user) {
         currentUser = user;
         listenForMessages();
       } else {
-        window.location.href = "index.html";
+        window.location.href = "index.html"; // redirect if not logged in
       }
     });
 
     const chatBox = document.getElementById("chat-box");
 
     function listenForMessages() {
-      const q = query(collection(db, "messages"), orderBy("timestamp"));
-      onSnapshot(q, snapshot => {
+      db.collection("messages").orderBy("timestamp").onSnapshot(snapshot => {
         chatBox.innerHTML = "";
         snapshot.forEach(doc => {
           const data = doc.data();
@@ -140,16 +142,17 @@
       });
     }
 
-    async function sendMessage() {
+    function sendMessage() {
       const input = document.getElementById("messageInput");
       const text = input.value.trim();
       if (!text || !currentUser) return;
 
-      await addDoc(collection(db, "messages"), {
+      db.collection("messages").add({
         text,
         uid: currentUser.uid,
-        timestamp: serverTimestamp()
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
       });
+
       input.value = "";
     }
   </script>
