@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profile - UniinChat</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .profile-container {
+      width: 100%;
+      max-width: 360px;
+      padding: 2rem;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .logo {
+      font-size: 26px;
+      font-weight: bold;
+      color: #004225;
+      margin-bottom: 1rem;
+    }
+
+    .avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 10px auto;
+      border: 3px solid #004225;
+    }
+
+    .info {
+      margin-top: 1rem;
+      font-size: 16px;
+    }
+
+    .info div {
+      margin: 6px 0;
+    }
+
+    .logout-btn {
+      margin-top: 20px;
+      padding: 12px;
+      background-color: #FF5757;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="profile-container">
+    <div class="logo">UniinChat</div>
+    <img id="avatar" class="avatar" src="https://i.imgur.com/1X8mK7c.png" alt="User Avatar" />
+    <div class="info">
+      <div><strong>Name:</strong> <span id="userName">...</span></div>
+      <div><strong>Email:</strong> <span id="userEmail">...</span></div>
+    </div>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBkr3uTfSqeeShHccsYH9B8iDKPWNTbAAY",
+      authDomain: "uniinchatapp.firebaseapp.com",
+      projectId: "uniinchatapp",
+      storageBucket: "uniinchatapp.firebasestorage.app",
+      messagingSenderId: "362376051567",
+      appId: "1:362376051567:web:eb8bf76bdf51d5aac9869a",
+      measurementId: "G-H3BJG5WCZQ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        document.getElementById("userName").textContent = user.displayName || "N/A";
+        document.getElementById("userEmail").textContent = user.email;
+        if (user.photoURL) {
+          document.getElementById("avatar").src = user.photoURL;
+        }
+      } else {
+        window.location.href = "index.html";
+      }
+    });
+
+    function logout() {
+      signOut(auth).then(() => {
+        window.location.href = "index.html";
+      }).catch(err => {
+        alert("Error logging out: " + err.message);
+      });
+    }
+  </script>
+</body>
+</html>
